@@ -52,7 +52,7 @@ const WBGT_LEVELS_COLOR = {
 const Y_TICKS_MIN = 15;
 const Y_TICKS_MAX = 35;
 const Y_TICKS_STEP = 5; // 5℃刻み
-const Y_TICKS_EXTRAS = {
+const Y_TICKS_EXTRAS: Record<string, number> = {
 	注意: 21,
 	警戒: 25,
 	厳重警戒: 28,
