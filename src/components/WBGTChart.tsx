@@ -23,11 +23,11 @@ function formatDate(dateString: string): [string, string, string] {
 }
 
 function getResponsiveFontSize(): number {
-	let baseFontSize = 28;
-	if (window.innerWidth >= 7680) baseFontSize = 38; // 7680×4320 (8K UHD), 超大型モニター
-	else if (window.innerWidth >= 3840) baseFontSize = 36; // 3840×2160 (4K UHD), 大型モニター
-	else if (window.innerWidth >= 2560) baseFontSize = 32; // 2560×1440 (WQHD), 大型モニター
-	else if (window.innerWidth >= 1920) baseFontSize = 28; // 1920×1080 (FHD), 32型tv, 1920×1200(一般モニター比率16:10)
+	let baseFontSize = 32;
+	if (window.innerWidth >= 7680) baseFontSize = 40; // 7680×4320 (8K UHD), 超大型モニター
+	else if (window.innerWidth >= 3840) baseFontSize = 38; // 3840×2160 (4K UHD), 大型モニター
+	else if (window.innerWidth >= 2560) baseFontSize = 36; // 2560×1440 (WQHD), 大型モニター
+	else if (window.innerWidth >= 1920) baseFontSize = 32; // 1920×1080 (FHD), 32型tv, 1920×1200(一般モニター比率16:10)
 
 	return baseFontSize * (window.devicePixelRatio || 1); // 高DPI対応も加味
 }
