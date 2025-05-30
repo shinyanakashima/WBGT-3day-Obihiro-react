@@ -23,16 +23,41 @@ function formatDate(dateString: string): [string, string, string] {
 }
 
 function getResponsiveFontSize(): number {
-	let baseFontSize = 32;
-	if (window.innerWidth >= 7680) baseFontSize = 40; // 7680×4320 (8K UHD), 超大型モニター
-	else if (window.innerWidth >= 3840) baseFontSize = 38; // 3840×2160 (4K UHD), 大型モニター
-	else if (window.innerWidth >= 2560) baseFontSize = 36; // 2560×1440 (WQHD), 大型モニター
-	else if (window.innerWidth >= 1920) baseFontSize = 32; // 1920×1080 (FHD), 32型tv, 1920×1200(一般モニター比率16:10)
+	let baseFontSize = 30;
+	if (window.innerWidth >= 7680) baseFontSize = 38; // 7680×4320 (8K UHD), 超大型モニター
+	else if (window.innerWidth >= 3840) baseFontSize = 36; // 3840×2160 (4K UHD), 大型モニター
+	else if (window.innerWidth >= 2560) baseFontSize = 34; // 2560×1440 (WQHD), 大型モニター
+	else if (window.innerWidth >= 1920) baseFontSize = 30; // 1920×1080 (FHD), 32型tv, 1920×1200(一般モニター比率16:10)
 
 	return baseFontSize * (window.devicePixelRatio || 1); // 高DPI対応も加味
 }
 
+const generateYTicks = (min: number, max: number, step: number, extras: number[]): number[] => {
+	const baseTicks: number[] = [];
+	for (let v = min; v <= max; v += step) {
+		baseTicks.push(v);
+	}
+
+	const merged: number[] = Array.from(new Set([...baseTicks, ...extras]));
+	return merged.sort((a, b) => a - b);
+};
+
 const CHITEN_URL = "https://6ealbffjxfgzo4r3kuiac7txry0bnwbm.lambda-url.us-east-1.on.aws/";
+const WBGT_LEVELS_COLOR = {
+	注意: "#a0d2ff", // 青系
+	警戒: "#F9E79F", // 黄色系
+	厳重警戒: "#FF8A65", // オレンジ系
+	危険: "#EF5350", // 赤系
+};
+const Y_TICKS_MIN = 15;
+const Y_TICKS_MAX = 35;
+const Y_TICKS_STEP = 5; // 5℃刻み
+const Y_TICKS_EXTRAS = {
+	注意: 21,
+	警戒: 25,
+	厳重警戒: 28,
+	危険: 31,
+};
 
 export const WBGTChart = () => {
 	const [chartData, setChartData] = useState<ChartData<"bar">>({
@@ -96,64 +121,64 @@ export const WBGTChart = () => {
 							annotations: {
 								level_2: {
 									type: "line",
-									yMin: 21,
-									yMax: 21,
-									borderColor: "#a0d2ff",
+									yMin: Y_TICKS_EXTRAS["注意"],
+									yMax: Y_TICKS_EXTRAS["注意"],
+									borderColor: WBGT_LEVELS_COLOR["注意"],
 									borderWidth: 5,
 									label: {
 										display: true,
-										content: "注意(21℃)",
+										content: "注意",
 										position: "end",
 										font: { size: RESPONSIVE_FONT_SIZE },
-										backgroundColor: "#a0d2ff",
+										backgroundColor: WBGT_LEVELS_COLOR["注意"],
 										color: "black",
 										padding: 10,
 									},
 								},
 								level_3: {
 									type: "line",
-									yMin: 25,
-									yMax: 25,
-									borderColor: "#F9E79F",
+									yMin: Y_TICKS_EXTRAS["警戒"],
+									yMax: Y_TICKS_EXTRAS["警戒"],
+									borderColor: WBGT_LEVELS_COLOR["警戒"],
 									borderWidth: 10,
 									label: {
 										display: true,
-										content: "警戒(25℃)",
+										content: "警戒",
 										position: "end",
 										font: { size: RESPONSIVE_FONT_SIZE },
-										backgroundColor: "#F9E79F",
+										backgroundColor: WBGT_LEVELS_COLOR["警戒"],
 										color: "black",
 										padding: 10,
 									},
 								},
 								level_4: {
 									type: "line",
-									yMin: 28,
-									yMax: 28,
-									borderColor: "#FF8A65",
+									yMin: Y_TICKS_EXTRAS["厳重警戒"],
+									yMax: Y_TICKS_EXTRAS["厳重警戒"],
+									borderColor: WBGT_LEVELS_COLOR["厳重警戒"],
 									borderWidth: 10,
 									label: {
 										display: true,
-										content: "厳重警戒(28℃)",
+										content: "厳重警戒",
 										position: "end",
 										font: { size: RESPONSIVE_FONT_SIZE },
-										backgroundColor: "#FF8A65",
+										backgroundColor: WBGT_LEVELS_COLOR["厳重警戒"],
 										color: "black",
 										padding: 10,
 									},
 								},
 								level_5: {
 									type: "line",
-									yMin: 31,
-									yMax: 31,
-									borderColor: "#EF5350",
+									yMin: Y_TICKS_EXTRAS["危険"],
+									yMax: Y_TICKS_EXTRAS["危険"],
+									borderColor: WBGT_LEVELS_COLOR["危険"],
 									borderWidth: 10,
 									label: {
 										display: true,
-										content: "危険(31℃)",
+										content: "危険",
 										position: "end",
 										font: { size: RESPONSIVE_FONT_SIZE },
-										backgroundColor: "#EF5350",
+										backgroundColor: WBGT_LEVELS_COLOR["危険"],
 										padding: 10,
 									},
 								},
@@ -226,7 +251,28 @@ export const WBGTChart = () => {
 								font: { size: 35 },
 								padding: { top: 20 },
 							},
+							afterBuildTicks: (axis) => {
+								const ticks = generateYTicks(
+									Y_TICKS_MIN,
+									Y_TICKS_MAX,
+									Y_TICKS_STEP,
+									Object.values(Y_TICKS_EXTRAS)
+								);
+								axis.ticks = ticks.map((v) => ({ value: v }));
+							},
 							ticks: {
+								color: (ctx) => {
+									const v = ctx.tick.value;
+									if (v === Y_TICKS_EXTRAS["厳重警戒"])
+										return WBGT_LEVELS_COLOR["厳重警戒"];
+									if (v === Y_TICKS_EXTRAS["警戒"])
+										return WBGT_LEVELS_COLOR["警戒"];
+									if (v === Y_TICKS_EXTRAS["注意"])
+										return WBGT_LEVELS_COLOR["注意"];
+									if (v === Y_TICKS_EXTRAS["危険"])
+										return WBGT_LEVELS_COLOR["危険"];
+									return "#666";
+								},
 								font: { size: RESPONSIVE_FONT_SIZE },
 							},
 						},
