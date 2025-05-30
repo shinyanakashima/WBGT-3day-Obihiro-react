@@ -23,11 +23,13 @@ function formatDate(dateString: string): [string, string, string] {
 }
 
 function getResponsiveFontSize(): number {
-	const baseFontSize = 14;
-	if (window.matchMedia("(min-width: 1920px)").matches) {
-		return baseFontSize * 3.5;
-	}
-	return baseFontSize;
+	let baseFontSize = 28;
+	if (window.innerWidth >= 7680) baseFontSize = 38; // 7680×4320 (8K UHD), 超大型モニター
+	else if (window.innerWidth >= 3840) baseFontSize = 36; // 3840×2160 (4K UHD), 大型モニター
+	else if (window.innerWidth >= 2560) baseFontSize = 32; // 2560×1440 (WQHD), 大型モニター
+	else if (window.innerWidth >= 1920) baseFontSize = 28; // 1920×1080 (FHD), 32型tv, 1920×1200(一般モニター比率16:10)
+
+	return baseFontSize * (window.devicePixelRatio || 1); // 高DPI対応も加味
 }
 
 const CHITEN_URL = "https://6ealbffjxfgzo4r3kuiac7txry0bnwbm.lambda-url.us-east-1.on.aws/";
@@ -66,6 +68,7 @@ export const WBGTChart = () => {
 				})();
 
 				const RESPONSIVE_FONT_SIZE = getResponsiveFontSize();
+				console.log("Responsive font size:", RESPONSIVE_FONT_SIZE);
 
 				setChartData({
 					labels: times,
@@ -206,9 +209,9 @@ export const WBGTChart = () => {
 						x: {
 							title: {
 								display: true,
-								text: "時",
+								text: "時間",
 								font: { size: 35 },
-								padding: { top: 20 },
+								padding: { top: 2 },
 							},
 							ticks: {
 								font: { size: RESPONSIVE_FONT_SIZE },
@@ -219,7 +222,7 @@ export const WBGTChart = () => {
 							suggestedMax: 35,
 							title: {
 								display: true,
-								text: "WBGT",
+								text: "WBGT(暑さ指数)",
 								font: { size: 35 },
 								padding: { top: 20 },
 							},
@@ -233,8 +236,8 @@ export const WBGTChart = () => {
 	}, []);
 
 	return (
-		<div className='pt-8 w-[95%] mx-auto'>
-			<h1 className='pt-4 pb-1 text-[4em] xl:text-[3em] 2xl:text-[4em] text-center'>
+		<div className='pt-1 w-[95%] mx-auto'>
+			<h1 className='pt-1 pb-1 text-[4em] xl:text-[3em] 2xl:text-[4em] text-center'>
 				3日間の熱中症予測
 			</h1>
 			<Bar data={chartData} options={chartOptions} />
