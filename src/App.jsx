@@ -3,7 +3,7 @@ import { WBGTChart } from "./components/WBGTChart";
 
 function App() {
 	return (
-		<BrowserRouter basename='/WBGT-3day-Obihiro-react'>
+		<BrowserRouter basename='/WBGT-3day-react'>
 			<Routes>
 				<Route path='/:city' element={<ChartPage />} />
 			</Routes>
