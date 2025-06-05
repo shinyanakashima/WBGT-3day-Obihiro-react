@@ -284,7 +284,7 @@ export const WBGTChart = () => {
 	return (
 		<div className='pt-1 w-[95%] mx-auto'>
 			<h1 className='pt-1 pb-1 text-[4em] xl:text-[3em] 2xl:text-[4em] text-center'>
-				3日間の熱中症予測
+				3日間の熱中症予測@帯広
 			</h1>
 			<Bar data={chartData} options={chartOptions} />
 		</div>
