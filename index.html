@@ -5,6 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3日間のWBGT</title>
+  <script>
+    const repoPath = location.pathname.split("/")[1];
+    if (location.pathname === `/${repoPath}/`) {
+      location.replace(`/${repoPath}/obihiro/`);
+    }
+  </script>
 </head>
 
 <body>
