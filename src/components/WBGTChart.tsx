@@ -42,7 +42,7 @@ const generateYTicks = (min: number, max: number, step: number, extras: number[]
 	return merged.sort((a, b) => a - b);
 };
 
-const CHITEN_URL = "https://6ealbffjxfgzo4r3kuiac7txry0bnwbm.lambda-url.us-east-1.on.aws/";
+const API_ENDPOINT_URL = "https://6ealbffjxfgzo4r3kuiac7txry0bnwbm.lambda-url.us-east-1.on.aws";
 const WBGT_LEVELS_COLOR = {
 	注意: "#a0d2ff", // 青系
 	警戒: "#F9E79F", // 黄色系
@@ -59,16 +59,22 @@ const Y_TICKS_EXTRAS: Record<string, number> = {
 	危険: 31,
 };
 
-export const WBGTChart = () => {
+export const WBGTChart = ({ city }: { city: string }) => {
+	const apiUrl = `${API_ENDPOINT_URL}/?chiten=${city}`;
 	const [chartData, setChartData] = useState<ChartData<"bar">>({
 		labels: [],
 		datasets: [],
 	});
+	console.log(apiUrl);
+	const CITY_LABELS: Record<string, string> = {
+		obihiro: "帯広",
+		sapporo: "札幌",
+	};
 
 	const [chartOptions, setChartOptions] = useState<ChartOptions<"bar">>({});
 
 	useEffect(() => {
-		fetch(CHITEN_URL, { mode: "cors" })
+		fetch(apiUrl, { mode: "cors" })
 			.then((res) => res.json())
 			.then((data) => {
 				const timesPerDay = ["09", "12", "15", "18"];
@@ -284,7 +290,7 @@ export const WBGTChart = () => {
 	return (
 		<div className='pt-1 w-[95%] mx-auto'>
 			<h1 className='pt-1 pb-1 text-[4em] xl:text-[3em] 2xl:text-[4em] text-center'>
-				3日間の熱中症予測@帯広
+				3日間の熱中症予測@{CITY_LABELS[city] ?? "不明な地域"}
 			</h1>
 			<Bar data={chartData} options={chartOptions} />
 		</div>
